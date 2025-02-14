@@ -72,6 +72,7 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ```
 
 admin (管理員) 查看訂單
+
 admin_id INT AUTO_INCREMENT PRIMARY KEY,
 username VARCHAR(50) UNIQUE NOT NULL,
 password VARCHAR(100) NOT NULL,
