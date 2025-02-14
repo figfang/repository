@@ -84,3 +84,5 @@ admin (管理員) 查看訂單
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 
 ```
+
+![image]([https://github.com/figfang/repository/blob/master/%E6%88%AA%E5%9C%96%202025-02-14%2010.53.20.png]
