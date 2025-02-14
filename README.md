@@ -10,16 +10,16 @@
 
 ### 1. 客戶管理
 
-- **註冊客戶** `POST /members`
-- **修改客戶資料** `PUT /memmers/{id}`
-- **查詢客戶資料** `GET /memmers/{id}`
+- **註冊客戶** `POST /member/register`
+- **修改客戶資料** `PUT /update`
+- **查詢客戶資料** `GET /members/{id}`
 
 ### 2. 訂位管理
 
 - **新增訂位** `POST /bookings`
-- **修改訂位** `PUT /booking/{id}`
-- **取消訂位** `DELETE /booking/{id}`
-- **查詢訂位** `GET /booking/{id}`
+- **修改訂位** `PUT /bookings/{bookingId}`
+- **取消訂位** `DELETE /bookings/{bookingId}`
+- **查詢訂位** `GET /booking/{bookingId}`
 
 ### 3. 時段表
 
