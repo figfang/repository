@@ -21,6 +21,8 @@
 - **取消訂位** `DELETE /bookings/{bookingId}`
 - **查詢訂位** `GET /booking/{bookingId}`
 
+  會發送簡訊通知
+
 ### 3. 時段表
 
 - **新增空時段** `POST /timeslots`
