@@ -2,7 +2,9 @@
 
 ### 專案簡介
 
-使用pring Boot開發的訂位管理系統，支援 **CRUD** 操作，包含 客戶管理、訂位管理、座位時段管理
+使用Spring Boot開發的訂位管理系統，支援 **CRUD** 操作，包含 客戶管理、訂位管理、座位時段管理
+
+應用將會在 http://localhost:8080 運行
 
 ## API 說明
 
@@ -73,9 +75,12 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 admin (管理員) 查看訂單
 
-admin_id INT AUTO_INCREMENT PRIMARY KEY,
-username VARCHAR(50) UNIQUE NOT NULL,
-password VARCHAR(100) NOT NULL,
-name VARCHAR(20) NOT NULL,
-role VARCHAR(20) DEFAULT 'ADMIN' NOT NULL,
-create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+
+     admin_id INT AUTO_INCREMENT PRIMARY KEY,
+     username VARCHAR(50) UNIQUE NOT NULL,
+     password VARCHAR(100) NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    role VARCHAR(20) DEFAULT 'ADMIN' NOT NULL,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+
+```
