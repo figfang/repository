@@ -21,25 +21,20 @@ public class Admin {
     @Column(name = "admin_id")
     private Integer adminId;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String username;
-
-    @Column(nullable = false, length = 100)
+	@Column(unique = true, nullable = false)
+    private String email;
+    
+    @Column(nullable = false)
     private String password;
-
-    @Column(nullable = false, length = 20)
+    
+    @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false, length = 20)
+    
+    @Column(nullable = false)
     private String role = "ADMIN";
-
-    @Column(name = "create_time", nullable = false, updatable = false)
+    
+    @Column(nullable = false)
     private LocalDateTime createTime;
-
-    @PrePersist
-    protected void onCreate() {
-        createTime = LocalDateTime.now();
-    }
 }
 
 

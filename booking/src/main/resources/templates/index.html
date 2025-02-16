@@ -30,12 +30,37 @@
             transform: scale(1.1);
             color: white;
         }
+        .admin-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 90px; /* 位置調整，避免與回首頁按鈕重疊 */
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #198754;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+    .admin-btn:hover {
+        background-color: #157347;
+        transform: scale(1.1);
+        color: white;
+    }
     </style>
 </head>
 <body class="bg-light">
     <!-- 回首頁按鈕 -->
     <a href="#" class="home-btn" onclick="returnHome()" title="回首頁">
         <i class="fas fa-home fa-lg"></i>
+    </a>
+     <!-- 業者按鈕 -->
+     <a href="#" class="admin-btn" onclick="showAdminModal()" title="業者專區">
+        <i class="fas fa-user-shield fa-lg"></i>
     </a>
     
     <!-- 導航欄 -->
@@ -219,7 +244,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="editTime" class="form-label">時間</label>
-                                <select class="form-select" id="ediTime" required>
+                                <select class="form-select" id="editTime" required>
                            <option value="">請選擇時間</option>
                            <option value="1">11:00-11:30</option>
                            <option value="2">12:00-12:30</option>
@@ -273,15 +298,17 @@
                             <div class="mb-3">
                                 <label for="editMemberEmail" class="form-label">電子信箱</label>
                                 <input type="email" class="form-control" id="editMemberEmail" readonly>
-                                <small class="text-muted">信箱不可修改</small>
+                                
                             </div>
                             <div class="mb-3">
                                 <label for="editMemberName" class="form-label">姓名</label>
-                                <input type="text" class="form-control" id="editMemberName" required>
+                                <input type="text" class="form-control" id="editMemberName" readonly>
+                                
                             </div>
                             <div class="mb-3">
                                 <label for="editMemberPhone" class="form-label">手機號碼</label>
-                                <input type="tel" class="form-control" id="editMemberPhone" required>
+                                <input type="tel" class="form-control" id="editMemberPhone" readonly>
+                                
                             </div>
                             <div class="mb-3">
                                 <label for="editMemberPassword" class="form-label">新密碼</label>
@@ -290,6 +317,10 @@
                             <div class="mb-3">
                                 <label for="editMemberPasswordConfirm" class="form-label">確認新密碼</label>
                                 <input type="password" class="form-control" id="editMemberPasswordConfirm" placeholder="若不修改密碼請留空">
+                            </div>
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">輸入舊密碼</label>
+                                <input type="password" class="form-control" id="editMemberPasswordConfirm" placeholder="若不修改密碼就不用輸入">
                             </div>
                         </form>
                     </div>
@@ -308,559 +339,9 @@
         </div>
     </div>
 
-    <script>
-        // 定義全局函數
-        window.showLoginForm = function() {
-            $('#homePage').hide();
-            $('#loginForm').show();
-            $('#registerForm').hide();
-        }
-
-        window.showRegisterForm = function() {
-            $('#homePage').hide();
-            $('#loginForm').hide();
-            $('#registerForm').show();
-        }
-
-        window.showReservationList = function() {
-            $('#reservationList').show();
-            $('#reservationForm').hide();
-            loadReservations();
-        }
-
-        window.showReservationForm = function() {
-            $('#reservationList').hide();
-            $('#reservationForm').show();
-        }
-
-        window.showEditMemberModal = function() {
-            // 填入現有會員資料
-            $('#editMemberEmail').val(localStorage.getItem('memberEmail'));
-            $('#editMemberName').val(localStorage.getItem('memberName'));
-            $('#editMemberPhone').val(localStorage.getItem('memberPhone'));
-            // 清空密碼欄位
-            $('#editMemberPassword').val('');
-            $('#editMemberPasswordConfirm').val('');
-            
-            // 顯示 Modal
-            new bootstrap.Modal('#editMemberModal').show();
-        }
-
-        window.updateMemberInfo = function() {
-            // 檢查如果要修改密碼，兩次輸入需相同
-            const newPassword = $('#editMemberPassword').val();
-            const confirmPassword = $('#editMemberPasswordConfirm').val();
-            if (newPassword && newPassword !== confirmPassword) {
-                alert('兩次密碼輸入不相同');
-                return;
-            }
-
-            const memberData = {
-                memberId: localStorage.getItem('memberId'),
-                email: $('#editMemberEmail').val(),
-                name: $('#editMemberName').val(),
-                phoneNumber: $('#editMemberPhone').val()
-            };
-
-            // 如果有輸入新密碼才加入密碼欄位
-            if (newPassword) {
-                memberData.password = newPassword;
-            }
-
-            $.ajax({
-                url: '/api/member/update',
-                method: 'PUT',
-                data: JSON.stringify(memberData),
-                contentType: 'application/json',
-                success: function(response) {
-                    if (response === "修改成功") {
-                        // 更新本地儲存的會員資料
-                        localStorage.setItem('memberName', memberData.name);
-                        localStorage.setItem('memberPhone', memberData.phoneNumber);
-                        
-                        // 更新顯示的會員名稱
-                        $('#userDisplayName').text(memberData.name);
-                        $('#reservationName').text(memberData.name);
-                        $('#reservationPhone').text(memberData.phoneNumber);
-                        
-                        // 關閉 Modal 並顯示成功訊息
-                        bootstrap.Modal.getInstance('#editMemberModal').hide();
-                        alert('會員資料修改成功！');
-                    } else {
-                        alert(response);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('修改失敗：' + xhr.responseText);
-                }
-            });
-        }
-
-        window.handleLogout = function() {
-            // 清除本地儲存的會員資訊
-            localStorage.removeItem('memberId');
-            localStorage.removeItem('memberName');
-            localStorage.removeItem('memberEmail');
-            localStorage.removeItem('memberPhone');
-            
-            $('#userNav').hide();
-            $('#reservationForm').hide();
-            $('#reservationList').hide();
-            $('#homePage').show();
-            $('#loginFormSubmit')[0].reset();
-        }
-
-        $(document).ready(function() {
-           
-            // 顯示首頁
-           //function showHomePage() {
-               /*  $('#homePage').show();
-                $('#loginForm').hide();
-                $('#registerForm').hide();
-                $('#reservationForm').hide(); */
-            //}
-
-            //* / 顯示登入表單
-           /*  window.showLoginForm = function() {
-                $('#homePage').hide();
-                $('#loginForm').show();
-                $('#registerForm').hide();
-            } */
-
-           /*  // 顯示註冊表單
-            window.showRegisterForm = function() {
-                $('#homePage').hide();
-                $('#loginForm').hide();
-                $('#registerForm').show();
-            } */
-
-            // 處理註冊表單提交
-            $('#registerFormSubmit').on('submit', function(e) {
-                e.preventDefault();
-                
-                // 檢查密碼是否匹配
-                if ($('#registerPassword').val() !== $('#registerPasswordConfirm').val()) {
-                    alert('密碼不匹配，請重新輸入');
-                    return;
-                }
-
-                const registerData = {
-                    name: $('#registerName').val(),
-                    email: $('#registerEmail').val(),
-                    phoneNumber: $('#registerPhone').val(),  
-                    password: $('#registerPassword').val()
-                };
-
-                $.ajax({
-                    url: '/api/member/register',  
-                    method: 'POST',
-                    data: JSON.stringify(registerData),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        if (response === "註冊成功") {
-                            alert('註冊成功！請登入');
-                            showLoginForm();
-                        } else {
-                            alert(response); // 顯示後端返回的訊息
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('註冊失敗：' + xhr.responseText);
-                    }
-                });
-            });
-
-            // 處理登入表單提交
-            $('#loginFormSubmit').on('submit', function(e) {
-                e.preventDefault();
-                
-                const loginData = {
-                    email: $('#email').val(),
-                    password: $('#password').val()
-                };
-
-                $.ajax({
-                    url: '/api/member/login',
-                    method: 'POST',
-                    data: JSON.stringify(loginData),
-                    contentType: 'application/json',
-                    success: function(response) {
-                    	
-                        // 儲存會員資訊
-                        localStorage.setItem('memberId', response.memberId);
-                        localStorage.setItem('memberName', response.name);
-                        localStorage.setItem('memberEmail', response.email);
-                        localStorage.setItem('memberPhoneNumber', response.phoneNumber);  // 儲存手機號碼
-                        
-                        console.log('儲存的會員ID:', response.memberId); // 檢查用
-                        
-                        // 更新界面
-                        $('#userDisplayName').text(response.name);
-                        $('#reservationName').text(response.name);
-                        $('#reservationPhone').text(response.phoneNumber);
-                        $('#userNav').show();
-                        $('#homePage').hide();
-                        $('#loginForm').hide();
-                        $('#reservationForm').show();
-                    },
-                    error: function(xhr) {
-                        let errorMsg = '登入失敗';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMsg = xhr.responseJSON.message;
-                        }
-                        alert(errorMsg);
-                    }
-                });
-            });
-
-            // 處理訂位表單提交
-            $('#reservationFormSubmit').on('submit', function(e) {
-                e.preventDefault();
-                
-                const memberId = localStorage.getItem('memberId');
-                if (!memberId) {
-                    alert('請先登入');
-                    window.location.reload();
-                    return;
-                }
-                const date = $('#date').val();
-                const time = $('#time').val();
-                const people = $('#people').val();
-
-                // 驗證所有欄位都已填寫
-                if (!date || !time || !people) {
-                    alert('請填寫所有欄位');
-                    return;
-                }
-                
-                const reservationData = {
-                        memberId: parseInt(memberId),
-                        timeSlotId: parseInt($('#time').val()),  
-                        bookingDate: $('#date').val(),
-                        numOfPeople: parseInt($('#people').val())
-                };
-
-                console.log('送出的資料：', reservationData); // 檢查發送的資料
-
-                $.ajax({
-                    url: '/api/bookings',
-                    method: 'POST',
-                    data: JSON.stringify(reservationData),
-                    contentType: 'application/json',
-                    success: function(response) {
-                    	
-                    	console.log('訂位成功回應：', response);  // 偵錯用
-                    	
-                        $('#successAlert').addClass('show');
-                        $('#reservationFormSubmit')[0].reset();
-                        // 儲存訂位ID，用於之後的修改和取消
-                        localStorage.setItem('lastBookingId', response.id);
-                        setTimeout(function() {
-                            $('#successAlert').removeClass('show');
-                        }, 3000);
-                    },
-                    error: function(xhr, status, error) {
-                        alert('訂位失敗，請稍後再試');
-                    }
-                });
-            });
-
-            // 設定日期最小值為今天
-            const today = new Date().toISOString().split('T')[0];
-            $('#date').attr('min', today);
-            $('#editDate').attr('min', today);
-
-            // 載入訂位列表
-            loadReservations();
-        });
-
-        // 顯示訂位列表
-        window.showReservationList = function() {
-            $('#reservationList').show();
-            $('#reservationForm').hide();
-            loadReservations();
-        }
-
-        // 顯示訂位表單
-        window.showReservationForm = function() {
-            $('#reservationList').hide();
-            $('#reservationForm').show();
-        }
-
-        // 載入訂位列表
-        function loadReservations() {
-            const memberId = localStorage.getItem('memberId');
-            if (!memberId) {
-                alert('請先登入');
-                window.location.reload();
-                return;
-            }
-            
-            
-            $.ajax({
-                url: `/api/bookings/member/${memberId}`, 
-                method: 'GET',
-                success: function(response) {
-                    updateReservationTable(response);
-                },
-                error: function(xhr, status, error) {
-                    alert('您目前沒有訂位');
-                }
-            });
-        }
-
-        // 更新訂位表格
-        function updateReservationTable(bookings) {
-            const tbody = $('#reservationTableBody');
-            tbody.empty();
-
-            bookings.forEach(booking => {
-                const row = $('<tr>');
-                row.html(`
-                		 <td>${booking.bookingDate}</td>
-                        <td>${getTimeSlotString(booking.timeSlotId)}</td>
-                        <td>${booking.numOfPeople || '1'}</td>
-                        <td>${localStorage.getItem('memberName')}</td>
-                        <td>${localStorage.getItem('memberPhoneNumber')}</td>
-                        <td>${booking.status || '已確認'}</td>
-                        <td>
-                        <button class="btn btn-sm btn-primary me-1" onclick="editBooking(${booking.id})">
-                            修改
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="cancelBooking(${booking.id})">
-                            取消
-                        </button>
-                    </td>
-                `);
-                tbody.append(row);
-            });
-        }
-
-        // 編輯訂位
-        function editBooking(bookingId) {
-        	
-        	if (!bookingId) {
-                alert('訂位資料錯誤');
-                return;
-            }
-
-            console.log('編輯訂位 ID:', bookingId);  // 檢查用
-        	
-            $.ajax({
-                url: `/api/bookings/${bookingId}`,
-                method: 'GET',
-                success: function(booking) {
-                    $('#editReservationId').val(bookingId);
-                    $('#editDate').val(booking.bookingDate);
-                    $('#editTime').val(booking.timeSlotId);
-                    $('#editPeople').val(booking.numOfPeople);
-                    $('#editName').val(localStorage.getItem('memberName'));
-                    $('#editPhone').val(localStorage.getItem('memberPhoneNumber'));
-                    
-                    new bootstrap.Modal('#editReservationModal').show();
-                },
-                error: function(xhr, status, error) {
-                    console.error('獲取資料失敗:', error);
-                    alert('獲取資料失敗');
-                }
-            });
-        }
-
-        // 更新訂位
-        function updateReservation() {
-         const bookingId = $('#editReservationId').val();
-         if (!bookingId) {
-              alert('無效的訂位編號');
-              return;
-     }
-        	
-            
-            
-            const updateData = {
-                id: parseInt(bookingId),
-                timeSlotId: parseInt($('#editTime').val()),
-                bookingDate: $('#editDate').val(),
-                numOfPeople: parseInt($('#editPeople').val()),
-                memberId: parseInt(localStorage.getItem('memberId'))
-            };
-
-            $.ajax({
-                url: `/api/bookings/${bookingId}`,
-                method: 'PUT',
-                data: JSON.stringify(updateData),
-                contentType: 'application/json',
-                success: function(response) {
-                    bootstrap.Modal.getInstance('#editReservationModal').hide();
-                    loadReservations();
-                    alert('修改成功！');
-                },
-                error: function(xhr, status, error) {
-                    alert('修改失敗，請稍後再試');
-                }
-            });
-        }
-
-        // 取消訂位
-        function cancelBooking(bookingId) {
-        	if (!bookingId){
-        		alert('訂位資料錯誤');
-        		return;
-        	}
-            if (confirm('確定要取消這筆訂位嗎？')) {
-                $.ajax({
-                    url: `/api/bookings/${bookingId}`,
-                    method: 'DELETE',
-                    success: function(response) {
-                        loadReservations();
-                        alert('取消成功！');
-                    },
-                    error: function(xhr, status, error) {
-                        alert('取消失敗，請稍後再試');
-                    }
-                });
-            }
-        }
-
-        // 時段ID轉換為顯示文字
-        function getTimeSlotString(timeSlotId) {
-            const timeSlots = {
-            		
-            		1: "11:00-11:30",
-                    2: "12:00-12:30",
-                    3: "13:00-13:30",
-                    4: "18:00-18:30",
-                    5: "19:00-19:30"
-            };
-            return timeSlots[timeSlotId] || "未知時段";
-        }
-
-        // 編輯訂位
-        window.editReservation = function(id) {
-            // 這裡應該先從後端獲取該訂位的詳細資料
-            $.ajax({
-                url: `/api/reservations/${id}`,
-                method: 'GET',
-                success: function(reservation) {
-                    $('#editReservationId').val(id);
-                    $('#editDate').val(reservation.date);
-                    $('#editTime').val(reservation.time);
-                    $('#editPeople').val(reservation.people);
-                    $('#editName').val(reservation.name);
-                    $('#editPhone').val(reservation.phone);
-                    
-                    new bootstrap.Modal('#editReservationModal').show();
-                }
-            });
-        }
-
-        // 更新訂位
-        window.updateReservation = function() {
-            const id = $('#editReservationId').val();
-            if (!id) {
-                alert('訂位資料錯誤');
-                return;
-            }
-            
-            const updateData = {
-            		id: parseInt(id),  // 加入 id
-                    timeSlotId: parseInt($('#editTime').val()),
-                    bookingDate: $('#editDate').val(),
-                    numOfPeople: parseInt($('#editPeople').val()),
-                    memberId: parseInt(localStorage.getItem('memberId'))
-            };
-            
-            console.log('更新的資料：', updateData);  // 檢查用
-
-
-            $.ajax({
-                url: `/api/booking/${id}`,
-                method: 'PUT',
-                data: JSON.stringify(updateData),
-                contentType: 'application/json',
-                success: function(response) {
-                    bootstrap.Modal.getInstance('#editReservationModal').hide();
-                    loadReservations();
-                    alert('修改成功！');
-                },
-                error: function(xhr, status, error) {
-                    alert('修改失敗，請稍後再試');
-                }
-            });
-        }
-
-        // 刪除訂位
-        window.deleteReservation = function(id) {
-            if (confirm('確定要刪除這筆訂位嗎？')) {
-                $.ajax({
-                    url: `/api/reservations/${id}`,
-                    method: 'DELETE',
-                    success: function(response) {
-                        loadReservations();
-                        alert('刪除成功！');
-                    },
-                    error: function(xhr, status, error) {
-                        alert('刪除失敗，請稍後再試');
-                    }
-                });
-            }
-        }
-
-        // 更新會員資料
-        window.updateMemberInfo = function() {
-            const memberData = {
-                id: currentUserId, // 需要從登入時保存用戶ID
-                name: $('#editName').val(),
-                email: $('#editEmail').val(),
-                phone: $('#editPhone').val()
-                // 根據需要添加其他欄位
-            };
-
-            $.ajax({
-                url: '/api/member/update',
-                method: 'PUT',
-                data: JSON.stringify(memberData),
-                contentType: 'application/json',
-                success: function(response) {
-                    if (response === "更新成功") {
-                        alert('會員資料更新成功！');
-                        $('#editMemberModal').modal('hide');
-                    } else {
-                        alert(response);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('更新失敗：' + xhr.responseText);
-                }
-            });
-        }
-        window.returnHome = function() {
-            $('#userNav').hide();
-            $('#loginForm').hide();
-            $('#registerForm').hide();
-            $('#reservationForm').hide();
-            $('#homePage').show();
-            // 清空所有表單
-            $('#loginFormSubmit')[0].reset();
-            $('#registerFormSubmit')[0].reset();
-            $('#reservationFormSubmit')[0].reset();
-        }
-
-        // 處理登出
-        function handleLogout() {
-            $('#userNav').hide();
-            $('#reservationForm').hide();
-            $('#homePage').show();
-            $('#loginFormSubmit')[0].reset();
-            
-            // 這裡可以加入呼叫登出API的程式碼
-            // $.ajax({
-            //     url: '/api/logout',
-            //     method: 'POST',
-            //     success: function(response) {
-            //         console.log('登出成功');
-            //     }
-            // });
-        }
-    </script>
+    <script src="js/booking.js"></script>
+    <script src="js/util.js"></script>
+    
+    
 </body>
 </html>

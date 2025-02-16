@@ -22,7 +22,7 @@ public class MemberService {
             return "客戶已完成註冊";
         }
 
-        // 創建新會員實體
+        // 創建新會員
         Member member = new Member();
         member.setEmail(dto.getEmail());
         member.setPassword(dto.getPassword());
@@ -34,12 +34,52 @@ public class MemberService {
         memberRepository.save(member);
         return "註冊成功";
     }
-
-    public String updateMember(Member member) {
-        if (!memberRepository.existsById(member.getMemberId())) {
-            return "客戶不存在";
-        }
-        memberRepository.save(member);
-        return "修改成功";
+    
+    //取得會員資料
+    public Member getMember(Integer memberId) { 
+    	return memberRepository.findById(memberId)
+    			.orElseThrow(() -> new RuntimeException("會員不存在"));
     }
+    
+    //更新會員資料
+    public String updateMember(Integer memberId, MemberDTO dto) {
+        Member member = memberRepository.findById(memberId)
+        		.orElseThrow(() -> new RuntimeException("會員不存在"));
+        
+        //檢查email是否已被其他會員使用
+        if (!member.getEmail().equals(dto.getEmail())) {
+        	if(memberRepository.existsByEmail(dto.getEmail())) {
+        		return "此email已被使用";
+        	}
+        	member.setEmail(dto.getEmail());
+        }
+        
+        member.setName(dto.getName());
+        member.setPhoneNumber(dto.getPhoneNumber());
+        memberRepository.save(member);
+        return "更新成功";      		 
+    }
+    
+    //更改密碼
+    public String updatePassword(Integer memberId, String oldPassword, String newPassword) {
+    	Member member = memberRepository.findById(memberId)
+    			.orElseThrow(() -> new RuntimeException("會員不存在"));
+    	
+    	if(!member.getPassword().equals(oldPassword)) {
+    		return "原密碼錯誤";
+    	}
+    	
+    	member.setPassword(newPassword);
+    	memberRepository.save(member);
+    	return "密碼更新成功";
+    }
+    
+    //刪除會員
+    public String deleteMember(Integer memberId) {
+    	Member member = memberRepository.findById(memberId)
+    			.orElseThrow(() -> new RuntimeException("會員不存在"));
+    	memberRepository.delete(member);
+    	return "刪除成功";
+    }
+    
 }

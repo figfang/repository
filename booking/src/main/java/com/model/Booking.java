@@ -38,6 +38,9 @@ public class Booking {
 
     @Column(name = "booking_date", nullable = false)
     private LocalDate bookingDate;
+    
+    @Column(name = "number_of_people", nullable = false)
+    private Integer numberOfPeople;
 
     @Column(nullable = false)
     private Integer status = 0; // 0: Pending, 1: Confirmed, 2: Canceled
