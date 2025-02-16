@@ -70,29 +70,41 @@ function login() {
 function createReservation() {
     $('#reservationFormSubmit').on('submit', function(e) {
         e.preventDefault();
-        console.log('表單提交');
 
         const memberId = sessionStorage.getItem('memberId');
         if (!memberId) {
             alert('會員資訊未找到，請重新登入');
+            showLoginForm();
             return;
         }
 
+        const date = $('#date').val();
+        const timeSlot = $('#time').val();
+        const numberOfPeople = $('#people').val();
+
+        // 確保所有必要欄位都有值且格式正確
         const data = {
-            memberId: Number(memberId),
-            date: $('#date').val(),
-            timeSlot: Number($('#time').val()),
-            numberOfPeople: Number($('#people').val()),
+            memberId: parseInt(memberId, 10),
+            timeSlotId: parseInt(timeSlot, 10),
+            bookingDate: date,
+            numberOfPeople: parseInt(numberOfPeople, 10),
             name: sessionStorage.getItem('name'),
             phoneNumber: sessionStorage.getItem('phoneNumber')
         };
 
-        if (!data.date || !data.timeSlot || !data.numberOfPeople || !data.name || !data.phoneNumber) {
+        // 驗證資料完整性
+        if (!data.memberId || !data.timeSlotId || !data.bookingDate || !data.numberOfPeople) {
             alert('請填寫所有必要欄位');
             return;
         }
-		
-		console.log('送出的訂位資料:', data);
+
+        // 驗證日期格式
+        const selectedDate = new Date(data.bookingDate);
+        const today = new Date();
+        if (selectedDate < today) {
+            alert('請選擇未來的日期');
+            return;
+        }
 
         $.ajax({
             url: '/api/bookings',
@@ -107,15 +119,24 @@ function createReservation() {
                 }, 3000);
             },
             error: function(xhr) {
-                alert('訂位失敗：' + xhr.responseJSON.message);
+                let errorMessage = '訂位失敗';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage += '：' + xhr.responseJSON.message;
+                }
+                alert(errorMessage);
             }
         });
     });
 }
-
 // 取得會員訂位列表
 function getReservationList() {
     const memberId = sessionStorage.getItem('memberId');
+    
+    if (!memberId) {
+        console.error('找不到會員ID');
+        showLoginForm();
+        return;
+    }
     
     $.ajax({
         url: `/api/bookings/member/${memberId}`,
@@ -124,14 +145,30 @@ function getReservationList() {
             const tbody = $('#reservationTableBody');
             tbody.empty();
             
+            if (!response || response.length === 0) {
+                tbody.append('<tr><td colspan="7" class="text-center">尚無訂位記錄</td></tr>');
+                return;
+            }
+
+            console.log('Retrieved bookings:', response); // 調試用
+            
             response.forEach(booking => {
+                if (!booking) return;
+                
+                // 從 timeSlot 物件中獲取時段信息
+                const timeSlotObj = booking.timeSlot || {};
+                const timeSlotValue = timeSlotObj.id || timeSlotObj.timeSlotId || null;
+                
+                // 從 member 物件中獲取會員信息
+                const memberObj = booking.member || {};
+                
                 const row = `
                     <tr>
-                        <td>${booking.date}</td>
-                        <td>${getTimeSlotText(booking.timeSlot)}</td>
-                        <td>${booking.numberOfPeople}人</td>
-                        <td>${booking.name}</td>
-                        <td>${booking.phoneNumber}</td>
+                        <td>${booking.bookingDate || '未設定'}</td>
+                        <td>${getTimeSlotText(timeSlotValue)}</td>
+                        <td>${booking.numberOfPeople || 0}人</td>
+                        <td>${memberObj.name || booking.name || '未設定'}</td>
+                        <td>${memberObj.phoneNumber || booking.phoneNumber || '未設定'}</td>
                         <td>${getStatusText(booking.status)}</td>
                         <td>
                             ${booking.status === 1 ? `
@@ -149,22 +186,33 @@ function getReservationList() {
             });
         },
         error: function(xhr) {
-            alert('獲取訂位列表失敗：' + xhr.responseJSON.message);
+            const errorMessage = xhr.responseJSON ? xhr.responseJSON.message : '系統錯誤，請稍後再試';
+            console.error('獲取訂位列表失敗：', errorMessage);
+            alert('獲取訂位列表失敗：' + errorMessage);
         }
     });
 }
 
 // 修改訂位
 function updateReservation() {
-	
     const bookingId = $('#editReservationId').val();
+    
+    // 修改資料格式，將 timeSlot 包裝成物件
     const data = {
-        date: $('#editDate').val(),
-        timeSlot: $('#editTime').val(),
-        numberOfPeople: $('#editPeople').val(),
+        bookingDate: $('#editDate').val(),
+        timeSlot: {
+            id: parseInt($('#editTime').val())
+        },
+        numberOfPeople: parseInt($('#editPeople').val()),
         name: $('#editName').val(),
         phoneNumber: $('#editPhone').val()
     };
+
+    // 資料驗證
+    if (!data.bookingDate || !data.timeSlot.id || !data.numberOfPeople) {
+        alert('請填寫所有必要欄位');
+        return;
+    }
 
     $.ajax({
         url: `/api/bookings/${bookingId}`,
@@ -177,10 +225,34 @@ function updateReservation() {
             getReservationList();
         },
         error: function(xhr) {
-            alert('修改失敗：' + xhr.responseJSON.message);
+            const errorMessage = xhr.responseJSON ? xhr.responseJSON.message : '系統錯誤，請稍後再試';
+            alert('修改失敗：' + errorMessage);
         }
     });
 }
+
+// 顯示編輯訂位 Modal 時的資料填充函數
+function showEditReservationModal(bookingId) {
+    $.ajax({
+        url: `/api/bookings/${bookingId}`,
+        type: 'GET',
+        success: function(booking) {
+            $('#editReservationId').val(bookingId);
+            $('#editDate').val(booking.bookingDate);
+            // 從 timeSlot 物件中獲取 id
+            $('#editTime').val(booking.timeSlot ? booking.timeSlot.id : '');
+            $('#editPeople').val(booking.numberOfPeople);
+            $('#editName').val(booking.name);
+            $('#editPhone').val(booking.phoneNumber);
+            
+            $('#editReservationModal').modal('show');
+        },
+        error: function(xhr) {
+            alert('獲取訂位資料失敗：' + (xhr.responseJSON ? xhr.responseJSON.message : '系統錯誤'));
+        }
+    });
+}
+
 
 // 取消訂位
 function cancelReservation(bookingId) {

@@ -52,6 +52,16 @@ public class AdminController {
 		return adminService.register(dto);
 	}
 	
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody AdminDTO dto) {
+	    try {
+	        Admin admin = adminService.login(dto.getEmail(), dto.getPassword());
+	        return ResponseEntity.ok(admin);
+	    } catch (Exception e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
+	}
+	
 	// 查詢所有管理員
     @GetMapping("/list")
     public List<Admin> findAll() {

@@ -33,6 +33,20 @@ public class AdminService {
         return "註冊成功";
     }
 	
+	public Admin login(String email, String password) {
+        Admin admin = adminRepository.findByEmail(email);
+        if (admin == null) {
+            throw new RuntimeException("管理員不存在");
+        }
+            
+        if (!admin.getPassword().equals(password)) {  //實際應用中應使用加密比對
+            throw new RuntimeException("密碼錯誤");
+        }
+        
+        return admin;
+    }
+
+	
 	// 查詢所有管理員
     public List<Admin> findAll() {
         return adminRepository.findAll();

@@ -21,7 +21,12 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
 	        LocalDate bookingDate, 
 	        Integer status
 	    );
-	    
+	
+	@Query("SELECT DISTINCT b FROM Booking b " +
+	           "LEFT JOIN FETCH b.member m " +
+	           "LEFT JOIN FETCH b.timeSlot t " +
+	           "WHERE b.member.memberId = :memberId " +
+	           "ORDER BY b.bookingDate DESC")    
 	    List<Booking> findByMemberMemberIdOrderByBookingDateDesc(Integer memberId);
 	}
 	
