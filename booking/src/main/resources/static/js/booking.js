@@ -171,7 +171,7 @@ function getReservationList() {
                         <td>${memberObj.phoneNumber || booking.phoneNumber || '未設定'}</td>
                         <td>${getStatusText(booking.status)}</td>
                         <td>
-                            ${booking.status === 1 ? `
+                            ${booking.status === 0 ? `
                                 <button class="btn btn-sm btn-primary me-2" onclick="showEditReservationModal(${booking.bookingId})">
                                     修改
                                 </button>

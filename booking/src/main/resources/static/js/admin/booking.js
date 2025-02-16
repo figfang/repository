@@ -109,8 +109,8 @@ const BookingManager = {
     getStatusBadge(status) {
         const statusMap = {
             0: ['已確認', 'success'],
-            1: ['已取消', 'danger'],
-            2: ['已完成', 'info']
+            1: ['已完成', 'danger'],
+            2: ['已取消', 'info']
         };
 
         const [text, color] = statusMap[status] || ['未知', 'secondary'];
@@ -121,8 +121,8 @@ const BookingManager = {
     getStatusText(status) {
         const statusMap = {
             0: '已確認',
-            1: '已取消',
-            2: '已完成'
+            1: '已完成',
+            2: '已取消'
         };
         return statusMap[status] || '未知狀態';
     },
