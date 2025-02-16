@@ -287,51 +287,47 @@
 
         <!-- 修改會員資料 Modal -->
         <div class="modal fade" id="editMemberModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">修改會員資料</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修改會員資料</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editMemberForm">
+                    <div class="mb-3">
+                        <label for="editMemberEmail" class="form-label">電子信箱</label>
+                        <input type="email" class="form-control" id="editMemberEmail" readonly>
                     </div>
-                    <div class="modal-body">
-                        <form id="editMemberForm">
-                            <div class="mb-3">
-                                <label for="editMemberEmail" class="form-label">電子信箱</label>
-                                <input type="email" class="form-control" id="editMemberEmail" readonly>
-                                
-                            </div>
-                            <div class="mb-3">
-                                <label for="editMemberName" class="form-label">姓名</label>
-                                <input type="text" class="form-control" id="editMemberName" readonly>
-                                
-                            </div>
-                            <div class="mb-3">
-                                <label for="editMemberPhone" class="form-label">手機號碼</label>
-                                <input type="tel" class="form-control" id="editMemberPhone" readonly>
-                                
-                            </div>
-                            <div class="mb-3">
-                                <label for="editMemberPassword" class="form-label">新密碼</label>
-                                <input type="password" class="form-control" id="editMemberPassword" placeholder="若不修改密碼請留空">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editMemberPasswordConfirm" class="form-label">確認新密碼</label>
-                                <input type="password" class="form-control" id="editMemberPasswordConfirm" placeholder="若不修改密碼請留空">
-                            </div>
-                            <div class="mb-3">
-                                <label for="currentPassword" class="form-label">輸入舊密碼</label>
-                                <input type="password" class="form-control" id="editMemberPasswordConfirm" placeholder="若不修改密碼就不用輸入">
-                            </div>
-                        </form>
+                    <div class="mb-3">
+                        <label for="editMemberName" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="editMemberName" readonly>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-primary" onclick="updateMemberInfo()">確認修改</button>
+                    <div class="mb-3">
+                        <label for="editMemberPhone" class="form-label">手機號碼</label>
+                        <input type="tel" class="form-control" id="editMemberPhone" readonly>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label for="editMemberPassword" class="form-label">新密碼</label>
+                        <input type="password" class="form-control" id="editMemberPassword" placeholder="若不修改密碼請留空">
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmNewPassword" class="form-label">確認新密碼</label>
+                        <input type="password" class="form-control" id="confirmNewPassword" placeholder="若不修改密碼請留空">
+                    </div>
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">輸入舊密碼</label>
+                        <input type="password" class="form-control" id="currentPassword" placeholder="若不修改密碼就不用輸入">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="updateMemberInfo()">確認修改</button>
             </div>
         </div>
-
+    </div>
+</div>
         <!-- 成功提示 -->
         <div class="alert alert-success alert-dismissible fade" role="alert" id="successAlert">
             <strong>訂位成功！</strong> 我們將發送簡訊至您的手機確認訂位資訊。

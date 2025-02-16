@@ -280,7 +280,7 @@ function updateMemberInfo() {
     const memberId = sessionStorage.getItem('memberId');
 	const currentPassword = $('#currentPassword').val();
     const newPassword = $('#editMemberPassword').val();
-    const confirmPassword = $('#editMemberPasswordConfirm').val();
+    const confirmPassword = $('#confirmNewPassword').val();
 
 	// 確認新密碼是否一致
 	    if (newPassword && newPassword !== confirmPassword) {
