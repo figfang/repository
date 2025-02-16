@@ -338,9 +338,9 @@ function getTimeSlotText(timeSlot) {
 // 工具函數：狀態文字轉換
 function getStatusText(status) {
     const statusMap = {
-        0: '已取消',
-        1: '已確認',
-        2: '已完成'
+        0: '已確認',
+        1: '已完成',
+        2: '已取消'
     };
     return statusMap[status] || '未知狀態';
 }

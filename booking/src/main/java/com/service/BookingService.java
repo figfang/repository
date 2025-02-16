@@ -1,6 +1,8 @@
 package com.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +46,7 @@ public class BookingService {
 
         // 獲取該時段的所有確認訂位
         List<Booking> confirmedBookings = bookingRepository.findByTimeSlotAndBookingDateAndStatus(
-                timeSlot, bookingDate, 1);
+                timeSlot, bookingDate, 0);
 
         // 計算已訂位的總人數
         int totalBookedPeople = confirmedBookings.stream()
@@ -76,7 +78,7 @@ public class BookingService {
         booking.setTimeSlot(timeSlot);
         booking.setBookingDate(request.getBookingDate());
         booking.setNumberOfPeople(request.getNumberOfPeople());
-        booking.setStatus(1);
+        booking.setStatus(0);
         
         booking = bookingRepository.save(booking);
         
@@ -106,9 +108,18 @@ public class BookingService {
             throw new RuntimeException("訂位已經被取消");
         }
 
-        if (booking.getStatus() == 1) {
-            throw new RuntimeException("已確認的訂位無法取消");
+//        if (booking.getStatus() == 1) {
+//            throw new RuntimeException("已確認的訂位無法取消");
+//        }
+        
+        // 檢查是否為訂位當天
+        LocalDate today = LocalDate.now();
+        LocalDate bookingDate = booking.getBookingDate();
+
+        if (today.equals(bookingDate)) {
+            throw new RuntimeException("訂位當天無法取消訂位");
         }
+
 
         // 更新狀態為已取消
         booking.setStatus(2);
@@ -133,11 +144,17 @@ public class BookingService {
            // 查找訂位
            Booking booking = bookingRepository.findById(bookingId)
                    .orElseThrow(() -> new RuntimeException("無法找到該訂位"));
-
-           // 驗證是否為待確認狀態
-           if (booking.getStatus() != 0) {
-               throw new RuntimeException("只能修改待確認狀態的訂位");
+           
+        // 檢查是否為當天訂位
+           LocalDate today = LocalDate.now();
+           if (booking.getBookingDate().equals(today)) {
+               throw new RuntimeException("當天訂位無法修改");
            }
+
+//           // 驗證是否為待確認狀態
+//           if (booking.getStatus() != 0) {
+//               throw new RuntimeException("只能修改待確認狀態的訂位");
+//           }
 
            // 如果要修改時段
            if (dto.getTimeSlotId() != null && !dto.getTimeSlotId().equals(booking.getTimeSlot().getTimeSlotId())) {

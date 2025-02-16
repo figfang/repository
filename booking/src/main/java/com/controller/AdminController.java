@@ -1,6 +1,7 @@
 package com.controller;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,27 @@ public class AdminController {
     @DeleteMapping("/{id}")
     public String deleteAdmin(@PathVariable Integer id) {
         return adminService.deleteAdmin(id);
+        
+    }
+    
+    //修改管理員帳號狀態
+    @PutMapping("/{adminId}/status")
+    public ResponseEntity<?> updateAdminStatus(
+            @PathVariable Integer adminId,
+            @RequestParam Integer status) {
+        
+        boolean success = adminService.updateAdminStatus(adminId, status);
+        
+        if (success) {
+            String message = status == 0 ? "管理員已啟用" : "管理員已停用";
+            return ResponseEntity.ok(new HashMap<String, String>() {{
+                put("message", message);
+            }});
+        } else {
+            return ResponseEntity.badRequest().body(new HashMap<String, String>() {{
+                put("error", "更新失敗，請確認管理員ID是否存在且狀態值正確");
+            }});
+        }
     }
     
     //查看所有會員

@@ -2,6 +2,7 @@ package com.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class AdminService {
         admin.setEmail(adminDTO.getEmail());
         admin.setPassword(adminDTO.getPassword());
         admin.setName(adminDTO.getName());
+        admin.setStatus(0); // 預設為啟用
         admin.setCreateTime(LocalDateTime.now());
         
         adminRepository.save(admin);
@@ -37,6 +39,10 @@ public class AdminService {
         Admin admin = adminRepository.findByEmail(email);
         if (admin == null) {
             throw new RuntimeException("管理員不存在");
+            
+        }
+        if (admin.getStatus() == 1) {
+            throw new RuntimeException("此帳號已停用");
         }
             
         if (!admin.getPassword().equals(password)) {  //實際應用中應使用加密比對
@@ -85,6 +91,23 @@ public class AdminService {
         }
         adminRepository.deleteById(id);
         return "刪除成功";
+    }
+    
+   // 變更管理員狀態
+    public boolean updateAdminStatus(Integer adminId, Integer status) {
+        Optional<Admin> adminOpt = adminRepository.findById(adminId);
+        
+        if (adminOpt.isPresent()) {
+            Admin admin = adminOpt.get();
+            // 確認狀態值是否有效
+            if (status != 0 && status != 1) {
+                return false;
+            }
+            admin.setStatus(status);
+            adminRepository.save(admin);
+            return true;
+        }
+        return false;
     }
 }
 	

@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -24,17 +23,19 @@ public class Admin {
 	@Column(unique = true, nullable = false)
     private String email;
     
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
     
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
     
-    @Column(nullable = false)
-    private String role = "ADMIN";
+    @Column(nullable = false, columnDefinition = "TINYINT DEFAULT 0")
+    private Integer status;  // 0:啟用, 1:停用
     
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createTime;
+    
+    
 }
 
 
