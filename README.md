@@ -140,3 +140,5 @@ CREATE TABLE admin (
     status TINYINT DEFAULT 0 NOT NULL COMMENT '0:啟用, 1:停用',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+INSERT INTO admin (email, password, status) VALUES 
+('admin01@example.com', 'pass1234', 0);
