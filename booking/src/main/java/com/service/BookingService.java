@@ -117,7 +117,7 @@ public class BookingService {
         LocalDate bookingDate = booking.getBookingDate();
 
         if (today.equals(bookingDate)) {
-            throw new RuntimeException("訂位當天無法取消訂位");
+            throw new RuntimeException("訂位當天無法取消訂位 如欲取消請與我們聯繫");
         }
 
 
