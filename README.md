@@ -70,7 +70,7 @@
 ### 訂位相關 API (`/api/bookings`)
 
 - `POST /api/bookings` - 新增訂位
-- `DELETE /api/bookings/{bookingId}` - 取消訂位
+- `DELETE /api/bookings/{bookingId}` - 取消訂位(若狀態已完成/當天的訂位 無法取消)
 - `GET /api/bookings/member/{memberId}` - 查看會員的訂位記錄
 - `PUT /api/bookings/{bookingId}` - 修改訂位
 
@@ -94,6 +94,9 @@ CREATE TABLE member (
     phone_number VARCHAR(10) NOT NULL,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+INSERT INTO member (email, password, name, phone_number) VALUES 
+('fang@example.com', 'pass1234', '方大同', '0912345678');
+
 ```
 
 ### 訂位資料表 (booking)
@@ -140,3 +143,5 @@ CREATE TABLE admin (
     status TINYINT DEFAULT 0 NOT NULL COMMENT '0:啟用, 1:停用',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+INSERT INTO admin (email, password, status) VALUES 
+('admin01@example.com', 'pass1234', 0);
