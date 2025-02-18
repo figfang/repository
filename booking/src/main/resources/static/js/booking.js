@@ -309,7 +309,9 @@ function cancelReservation(bookingId) {
         url: `/api/bookings/${bookingId}/?memberId=${memberId}`,
         type: 'DELETE',
         success: function(response) {
-			console.log('簡訊內容： 您的訂位已取消');
+			const smsContent = `您的訂位已取消`;
+			console.log('簡訊內容：\n' + smsContent);
+			
 			
             alert('取消成功');
             getReservationList();
