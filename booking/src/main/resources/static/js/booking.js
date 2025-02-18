@@ -138,7 +138,16 @@ function createReservation() {
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function(response) {
-                $('#successAlert').addClass('show');
+				const smsContent = `訂位成功通知：
+				
+				您的訂位已確認！
+				用餐日期：${data.bookingDate}
+				時段：${getTimeSlotText(data.timeSlotId)}
+				人數：${data.numberOfPeople}人`;
+	
+				console.log('簡訊內容：\n' + smsContent);
+				
+				$('#successAlert').addClass('show');
                 setTimeout(() => {
                     $('#successAlert').removeClass('show');
                     showReservationList();
@@ -246,6 +255,13 @@ function updateReservation() {
         contentType: 'application/json',
         data: JSON.stringify(data),
         success: function(response) {
+			const smsContent = `訂位修改成功通知：
+			您的訂位已更新！
+			日期：${data.bookingDate}
+			時段：${getTimeSlotText(data.timeSlot.id)}
+			人數：${data.numberOfPeople}人`;
+			console.log('簡訊內容：\n' + smsContent);
+			
             $('#editReservationModal').modal('hide');
             alert('修改成功');
             getReservationList();
@@ -287,16 +303,20 @@ function cancelReservation(bookingId) {
     }
 
     const memberId = sessionStorage.getItem('memberId');
+	
 
     $.ajax({
         url: `/api/bookings/${bookingId}/?memberId=${memberId}`,
         type: 'DELETE',
         success: function(response) {
+			console.log('簡訊內容： 您的訂位已取消');
+			
             alert('取消成功');
             getReservationList();
         },
         error: function(xhr) {
-            alert('取消失敗：' + xhr.responseJSON.message);
+			console.log('簡訊發送失敗：系統異常，請稍後再試');
+			alert('取消失敗：' + xhr.responseJSON.message);
         }
     });
 }

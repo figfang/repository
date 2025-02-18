@@ -84,7 +84,7 @@ public class BookingService {
         
      // 發送訂位成功通知
         String message = String.format(
-            "您的訂位已送出！用餐日期：%s，人數：%d人",
+            "您好 您的訂位已確認！用餐日期：%s，人數：%d人",
             booking.getBookingDate().toString(),
             booking.getNumberOfPeople()
         );
@@ -127,7 +127,7 @@ public class BookingService {
 
         // 發送取消通知
         String message = String.format(
-            "您的訂位已取消！原用餐日期：%s，人數：%d人",
+            "您好 已取消以下訂位！原用餐日期：%s，人數：%d人",
             booking.getBookingDate().toString(),
             booking.getNumberOfPeople()
         );
@@ -184,7 +184,7 @@ public class BookingService {
 
            // 發送修改通知
            String message = String.format(
-               "您的訂位已更新！新用餐日期：%s，最新人數：%d人，狀態：待確認",
+               "您好 您的訂位已更新！新用餐日期：%s，最新人數：%d人",
                booking.getBookingDate().toString(),
                booking.getNumberOfPeople()
            );
