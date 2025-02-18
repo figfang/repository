@@ -99,12 +99,38 @@ function createReservation() {
         }
 
         // 驗證日期格式
-        const selectedDate = new Date(data.bookingDate);
-        const today = new Date();
+		const selectedDate = new Date(data.bookingDate);
+		const today = new Date();
+		
+		// 重設時間為凌晨 00:00:00
+		        selectedDate.setHours(0, 0, 0, 0);
+		        today.setHours(0, 0, 0, 0);
+				
         if (selectedDate < today) {
             alert('請選擇未來的日期');
             return;
         }
+		
+		    // 驗證時段
+		    const currentHour = today.getHours();
+		    const selectedHour = parseInt(timeSlot.split(':')[0], 10);
+			
+			//如果是訂位當天檢查時段
+			if (selectedDate.toDateString() === today.toDateString()) {
+		    
+		      
+		      // 確認是否已超過欲訂位時段
+		      if (selectedHour <= currentHour) {
+		        alert('無法訂位已過的時段，請選擇其他時間');
+		        return;
+		      }
+		      
+		      // 確認是否預留足夠準備時間
+		      if (selectedHour - currentHour < 1) {
+		        alert('請至少提前1小時訂位');
+		        return;
+		      }
+		    }
 
         $.ajax({
             url: '/api/bookings',
@@ -155,11 +181,11 @@ function getReservationList() {
             response.forEach(booking => {
                 if (!booking) return;
                 
-                // 從 timeSlot 物件中獲取時段信息
+                // 從 timeSlot 物件中獲取時段資訊
                 const timeSlotObj = booking.timeSlot || {};
                 const timeSlotValue = timeSlotObj.id || timeSlotObj.timeSlotId || null;
                 
-                // 從 member 物件中獲取會員信息
+                // 從 member 物件中獲取會員資訊
                 const memberObj = booking.member || {};
                 
                 const row = `
